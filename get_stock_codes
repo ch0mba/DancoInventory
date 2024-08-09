@@ -1,0 +1,41 @@
+<?php
+include 'connection.php'; // Include the connection script
+
+$input = $_GET['input'];
+
+// Query to retrieve matching stock codes
+$query = "SELECT DISTINCT stockcode FROM inventory WHERE stockcode LIKE ? ORDER BY stockcode LIMIT 10";
+
+// Prepare the statement
+$stmt = $conn->prepare($query);
+
+// Check if the statement was prepared successfully
+if ($stmt) {
+    $searchTerm = '%' . $input . '%';
+    $stmt->bind_param("s", $searchTerm);
+
+    // Execute the statement
+    $stmt->execute();
+
+    // Bind the result variable
+    $stmt->bind_result($stock_code);
+
+    // Fetch and store the suggestions in an array
+    $suggestions = [];
+    while ($stmt->fetch()) {
+        $suggestions[] = $stock_code;
+    }
+
+    // Output the JSON-encoded suggestions
+    echo json_encode($suggestions);
+
+    // Close the statement
+    $stmt->close();
+} else {
+    // Handle error if statement preparation fails
+    echo "Error preparing SQL statement: " . $conn->error;
+}
+
+// Close the connection
+$conn->close();
+?>
