@@ -214,6 +214,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="datetime-local" name="timeout" id="timeout" required>
                 </div>
 
+                <div class="container">
+                        <button class="button" onclick="setTime('start-time')">Start</button>
+                        <input type="text" id="start-time" readonly>
+                        <button class="button" onclick="setTime('end-time')">End</button>
+                        <input type="text" id="end-time" readonly>
+                </div>
+
                 <div class="field input">
                     <label for="comments">Comments</label>
                     <br>

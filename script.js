@@ -7,3 +7,10 @@
      document.getElementById('brand').value ='';
 }
 document.getElementById('undo').addEventListener('click', clearFields);
+
+
+function setTime(id){
+    document.getElementById(id).value = new Date().toLocaleTimeString();
+}
+
+
