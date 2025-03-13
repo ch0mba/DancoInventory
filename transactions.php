@@ -20,6 +20,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stockcode = $_POST['stockcode'];
         $transaction_quantity = $_POST['transaction_quantity'];
         $reference = $_POST['reference'];
+        $stakeholer = $_POST['stakeholder'] ?? '';
+        $name = $_POST['name'];
+        $truck = $_POST['truck'];
+        $timein = $_POST['timein'];
+        $timeout = $_POST['timeout'];
+        $start_time = $_POST['start_time'];
+        $end_time = $_POST['end_time'];
+        $brand = $_POST['brand'];
+
+
 
         // Check if the stock code exists in the inventory
         $checkSql = "SELECT * FROM inventory WHERE stockcode = ?";
@@ -60,10 +70,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 } else {
                 
                 // Insert data into transactions table
-                $sql = "INSERT INTO transactions (stockcode, transaction_type, transaction_quantity, reference)
-                        VALUES (?, ?, ?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssss", $stockcode, $transaction_type, $transaction_quantity, $reference);
+                $sql = "INSERT INTO transactions 
+                        (stockcode, transaction_type, transaction_quantity, reference, stakeholder, name, truck, timein, timeout, start_time, end_time, brand) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("ssssssssssss", $stockcode, $transaction_type, $transaction_quantity, $reference, $stakeholder, $name, $truck, $timein, $timeout, $start_time, $end_time, $brand);
+
 
                 if ($stmt->execute()) {
                     echo "New record created successfully";
@@ -184,19 +197,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="field input">
-                    <label for="stakeholder">Choose stakeholder</label>
-                    <br>
-                    <select>
-                        <option value="none">none</option>
+                    <label for="stakeholder">Choose Stakeholder</label>
+                    <select name="stakeholder" required>
+                        <option value="none">None</option>
                         <option value="inventory">Inventory</option>
                         <option value="production">Production</option>
                         <option value="IT">IT</option>
                         <option value="operations">Operations</option>
-                        <option value="operations">Operations</option>
                     </select>
+                    </div>
                     <br>
-                    <label for="stakeholder">Officer Name</label>
-                    <input type="text" name="officer name" id="stakeholder" required>
+
+                <div class="field input">
+                    <label for="name">Officer Name</label>
+                    <input type="text" name="name" id="name" required>
                 </div>
 
                 <div class="field input">
@@ -215,16 +229,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="container">
-                        <button class="button" onclick="setTime('start-time')">Start</button>
-                        <input type="text" id="start-time" readonly>
-                        <button class="button" onclick="setTime('end-time')">End</button>
-                        <input type="text" id="end-time" readonly>
-                </div>
+                        <button class="button" type="button" onclick="setTime('start_time')">Start</button>
+                        <br>
+                        <input type="text" name="start-time" id="start_time" readonly>
+                        <br>
+                        <button class="button" type="button" onclick="setTime('end_time')">End</button>
+                        <br>
+                        <input type="text" name="end_time" id="end_time" readonly>
+                    </div>
 
                 <div class="field input">
-                    <label for="comments">Comments</label>
+                    <label for="reference">Comments</label>
                     <br>
-                    <input type="text" name="comments" id="comments" required>
+                    <input type="text" name="reference" id="reference" required>
                 </div>
 
                 <div class="field input">
