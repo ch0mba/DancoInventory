@@ -48,8 +48,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $transaction_type = $row['transaction_type'];
 
                 //check if the requested quantity is available for issue or expense transaction
-                if(($transaction_type == 'Issue' || $transaction_type == 'Expense') && $transaction_quantity > $current_quantity) {
-                    echo "Sorry but only" . $current_quantity . "quantities of stock " . $stockcode . " are available.";
+                if(($transaction_type == 'Issue' || 
+                    $transaction_type == 'Expense' || 
+                    $transaction_type == 'Sample Issuance' ||
+                    $transaction_type == 'Departmental Issuance' ||
+                    $transaction_type == 'Loss/Pilferage' || 
+                    $transaction_type == 'Negative Adjustment' || $transaction_type == 'Sale'   
+                
+                ) && $transaction_quantity > $current_quantity) {
+                    echo "Sorry but only " . $current_quantity . " quantities of stock " . $stockcode . " are available.";
                 } else {
                 
                 // Insert data into transactions table
@@ -62,9 +69,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     echo "New record created successfully";
 
                     // Update inventory quantity based on transaction type
-                    if ($transaction_type == 'Issue' || $transaction_type == 'Expense' || $transaction_type == 'Negative Adjustment') {
+                    if ($transaction_type == 'Issue' || $transaction_type == 'Expense' || $transaction_type == 'Negative Adjustment'
+                    || $transaction_type == 'Sample Issuance' || $transaction_type == 'Departmental Issuance' || $transaction_type == 'Sale' || $transaction_type == 'Loss/Pilferage') {
                         $updateSql = "UPDATE inventory SET quantity = quantity - ? WHERE stockcode = ?";
-                    } elseif ($transaction_type == 'Receipt'  || $transaction_type == 'Positive Adjustment') {
+                        // positive receipts
+                    } elseif ($transaction_type == 'Receipt'  || $transaction_type == 'Positive Adjustment'  || $transaction_type == 'Production Receipt'
+                      || $transaction_type == 'Production Receipt' || $transaction_type == 'Customer Returns' || $transaction_type == 'Sample Return' || $transaction_type == 'Transfer In'
+                        || $transaction_type == 'Used Spare Receipts' || $transaction_type == 'Bi-product Receipt') 
+                    {
                         $updateSql = "UPDATE inventory SET quantity = quantity + ? WHERE stockcode = ?";
                     }
 
@@ -144,6 +156,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="field input">
+                    <label for="brand">Brand</label>
+                    <input type="text" name="brand" id="brand" required>
+                    <div class="suggestions"></div>
+                </div>
+
+                <div class="field input">
                     <label for="transaction_type">Transaction Type</label>
                     <select name="transaction_type" id="transaction_type" required>
                     <?php                
@@ -166,16 +184,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="field input">
-                    <label for="reference">Reference</label>
-                    <input type="text" name="reference" id="reference" required>
+                    <label for="stakeholder">Choose stakeholder</label>
+                    <br>
+                    <select>
+                        <option value="none">none</option>
+                        <option value="inventory">Inventory</option>
+                        <option value="production">Production</option>
+                        <option value="IT">IT</option>
+                        <option value="operations">Operations</option>
+                        <option value="operations">Operations</option>
+                    </select>
+                    <br>
+                    <label for="stakeholder">Officer Name</label>
+                    <input type="text" name="officer name" id="stakeholder" required>
                 </div>
 
-                <div class="field">
+                <div class="field input">
+                    <label for="truck">Truck Number</label>
+                    <input type="text" name="truck" id="truck" required>
+                </div>
+
+                <div class="field input">
+                    <label for="timein">Truck Time in</label>
+                    <input type="datetime-local" name="timein" id="timein" required>
+                </div>
+
+                <div class="field input">
+                    <label for="timeout">Truck Time out</label>
+                    <input type="datetime-local" name="timeout" id="timeout" required>
+                </div>
+
+                <div class="container">
+                        <button class="button" onclick="setTime('start-time')">Start</button>
+                        <input type="text" id="start-time" readonly>
+                        <button class="button" onclick="setTime('end-time')">End</button>
+                        <input type="text" id="end-time" readonly>
+                </div>
+
+                <div class="field input">
+                    <label for="comments">Comments</label>
+                    <br>
+                    <input type="text" name="comments" id="comments" required>
+                </div>
+
+                <div class="field input">
                     <input type="submit" class="btn" name="submit" value="Submit">
                     <!--button type="submit" class="btn" name="delete">Delete</button-->
-                    <button id="undo" type="button" class="btn">Undo</button>
+                    <button id="undo" type="button" class="green-button">Undo</button>
                     <script src="script.js"></script>
-                    <a href="home.php" class="btn">Home</a>
+
+                    <a href="home.php" class="green-button">Home</a>
                 </div>
             </form>
         </div>

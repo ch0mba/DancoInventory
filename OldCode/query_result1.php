@@ -1,6 +1,3 @@
-<?php
-    include 'connection.php';
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,17 +29,6 @@
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-
-        .btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: rgba(255,140,0,0.808);
             color: white;
             border: none;
             border-radius: 5px;
@@ -84,8 +70,8 @@
     }
 
     // Check if stock code is provided in the request
-    if (isset($_POST['stockcode'])) {
-        $stockCode = sanitize($conn, $_POST['stockcode']);
+    if (isset($_POST['stock_code'])) {
+        $stockCode = sanitize($conn, $_POST['stock_code']);
 
         // Query to retrieve inventory details
         $inventoryQuery = "SELECT stockcode, productclass, warehouse, quantity FROM inventory WHERE stockcode = '$stockCode'";
@@ -172,6 +158,7 @@
 
         // Free transaction history result
         $transactionResult->free();
+
     } else {
         echo "No stock code provided.";
     }
@@ -180,7 +167,7 @@
     $conn->close();
     ?>
 
-    <!-- JavaScript function to print the table -->
+    <!-- JavaScript function to print the inventory table -->
     <script>
         function printInventoryTable() {
             var printWindow = window.open('', '_blank');
@@ -190,7 +177,13 @@
             printWindow.document.close();
             printWindow.print();
         }
+    </script>
 
+    <!-- Button to trigger printing of the inventory table -->
+    <button onclick="printInventoryTable()">Print Inventory Table</button>
+
+    <!-- JavaScript function to print the transaction table -->
+    <script>
         function printTransactionTable() {
             var printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Print Transaction Table</title></head><body>');
@@ -201,39 +194,24 @@
         }
     </script>
 
-    <!-- Button to trigger printing of the inventory table -->
-    <button  class ="btn" onclick="printInventoryTable()">Print Inventory Table</button>
-
     <!-- Button to trigger printing of the transaction table -->
-    <button  class= "btn" onclick="printTransactionTable()">Print Transaction Table</button>
+    <button onclick="printTransactionTable()">Print Transaction Table</button>
 
-    <!-- JavaScript function to export transaction table data to CSV -->
+    <!-- JavaScript function to export table data to Excel -->
     <script>
-        function exportToCsv() {
-            var csv = [];
-            var rows = document.getElementById('transactionTable').querySelectorAll('tr');
-
-            for (var i = 0; i < rows.length; i++) {
-                var row = [], cols = rows[i].querySelectorAll('td, th');
-
-                for (var j = 0; j < cols.length; j++)
-                    row.push(cols[j].innerText);
-
-                csv.push(row.join(','));
-            }
-
-            var csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
-            var encodedUri = encodeURI(csvContent);
-            var link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
-            link.setAttribute('download', 'transaction_table.csv');
-            document.body.appendChild(link);
+        function exportToExcel() {
+            var table = document.getElementById("transactionTable");
+            var html = table.outerHTML;
+            var url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            var link = document.createElement("a");
+            link.download = "transaction_report.xls";
+            link.href = url;
             link.click();
         }
     </script>
 
-    <!-- Button to export transaction table data to CSV -->
-    <button class="export-btn" onclick="exportToCsv()">Export Transaction Table to CSV</button>
+    <!-- Button to export transaction table data to Excel -->
+    <button onclick="exportToExcel()">Export Transaction Table to Excel</button>
 </div>
 </body>
 </html>
