@@ -4,5 +4,6 @@
      document.getElementById('warehouse').value = '';
      document.getElementById('quantity').value = '';
      document.getElementById('transaction_type').value = '';
+     document.getElementById('brand').value ='';
 }
 document.getElementById('undo').addEventListener('click', clearFields);
