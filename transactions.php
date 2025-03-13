@@ -228,15 +228,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="datetime-local" name="timeout" id="timeout" required>
                 </div>
 
-                <div class="container">
-                        <button class="button" type="button" onclick="setTime('start_time')">Start</button>
+                <!--<div class="container">
+                        <p id="currentTime"> </p>
+                        <button id="timebutton" class="button" type="button" onclick="setTime('start_time')">Start</button>
                         <br>
                         <input type="text" name="start-time" id="start_time" readonly>
                         <br>
-                        <button class="button" type="button" onclick="setTime('end_time')">End</button>
+                        <button id="timebutton" class="button" type="button" onclick="setTime('end_time')">End</button>
                         <br>
                         <input type="text" name="end_time" id="end_time" readonly>
                     </div>
+                -->
 
                 <div class="field input">
                     <label for="reference">Comments</label>
@@ -248,7 +250,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="submit" class="btn" name="submit" value="Submit">
                     <!--button type="submit" class="btn" name="delete">Delete</button-->
                     <button id="undo" type="button" class="green-button">Undo</button>
-                    <script src="script.js"></script>
+                    <script src="script.js" defer></script>
 
                     <a href="home.php" class="green-button">Home</a>
                 </div>
