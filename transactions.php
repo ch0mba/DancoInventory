@@ -156,6 +156,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="field input">
+                    <label for="brand">Brand</label>
+                    <input type="text" name="brand" id="brand" required>
+                    <div class="suggestions"></div>
+                </div>
+
+                <div class="field input">
                     <label for="transaction_type">Transaction Type</label>
                     <select name="transaction_type" id="transaction_type" required>
                     <?php                
@@ -178,16 +184,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="field input">
-                    <label for="reference">Reference</label>
-                    <input type="text" name="reference" id="reference" required>
+                    <label for="stakeholder">Choose stakeholder</label>
+                    <br>
+                    <select>
+                        <option value="none">none</option>
+                        <option value="inventory">Inventory</option>
+                        <option value="production">Production</option>
+                        <option value="IT">IT</option>
+                        <option value="operations">Operations</option>
+                        <option value="operations">Operations</option>
+                    </select>
+                    <br>
+                    <label for="stakeholder">Officer Name</label>
+                    <input type="text" name="officer name" id="stakeholder" required>
                 </div>
 
-                <div class="field">
+                <div class="field input">
+                    <label for="truck">Truck Number</label>
+                    <input type="text" name="truck" id="truck" required>
+                </div>
+
+                <div class="field input">
+                    <label for="timein">Truck Time in</label>
+                    <input type="datetime-local" name="timein" id="timein" required>
+                </div>
+
+                <div class="field input">
+                    <label for="timeout">Truck Time out</label>
+                    <input type="datetime-local" name="timeout" id="timeout" required>
+                </div>
+
+                <div class="field input">
+                    <label for="comments">Comments</label>
+                    <br>
+                    <input type="text" name="comments" id="comments" required>
+                </div>
+
+                <div class="field input">
                     <input type="submit" class="btn" name="submit" value="Submit">
                     <!--button type="submit" class="btn" name="delete">Delete</button-->
-                    <button id="undo" type="button" class="btn">Undo</button>
+                    <button id="undo" type="button" class="green-button">Undo</button>
                     <script src="script.js"></script>
-                    <a href="home.php" class="btn">Home</a>
+
+                    <a href="home.php" class="green-button">Home</a>
                 </div>
             </form>
         </div>
