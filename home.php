@@ -34,6 +34,7 @@
     .pink { background-color: #e74c3c; }
     .purple { background-color:#9b59b6; }
     .yellow { background-color:#c2b300; }
+    .black { background-color:black; }
     h2 {
         color: #fff;
         font-size: 24px;
@@ -55,6 +56,10 @@
 
     <a href="transaction_setup.php"class="box purple ">
         <h2>Transaction Setup</h2>
+    </a> 
+
+    <a href="stocklocation_setup.php"class="box black ">
+        <h2>Stock Location Setup</h2>
     </a> 
     <a href="reports.php"class="box pink">
         <h2>Reports</h2>

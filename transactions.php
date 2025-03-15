@@ -25,10 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $truck = $_POST['truck'];
         $timein = $_POST['timein'];
         $timeout = $_POST['timeout'];
-        $start_time = $_POST['start_time'];
-        $end_time = $_POST['end_time'];
         $brand = $_POST['brand'];
-
+        $stock_location = $_POST['stock_location'];
 
 
         // Check if the stock code exists in the inventory
@@ -71,11 +69,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 // Insert data into transactions table
                 $sql = "INSERT INTO transactions 
-                        (stockcode, transaction_type, transaction_quantity, reference, stakeholder, name, truck, timein, timeout, start_time, end_time, brand) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        (stockcode, transaction_type, transaction_quantity, stock_location, reference, stakeholder, name, truck, timein, timeout, start_time, end_time, brand) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
                     $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("ssssssssssss", $stockcode, $transaction_type, $transaction_quantity, $reference, $stakeholder, $name, $truck, $timein, $timeout, $start_time, $end_time, $brand);
+                    $stmt->bind_param("sssssssssssss", $stockcode, $transaction_type, $transaction_quantity, $stock_location, $reference, $stakeholder, $name, $truck, $timein, $timeout, $start_time, $end_time, $brand);
 
 
                 if ($stmt->execute()) {
@@ -182,11 +180,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sqlTransactionTypes = "SELECT transaction_type FROM transactiontype";
                     $resultTransactionTypes = $conn->query($sqlTransactionTypes);
                     if ($resultTransactionTypes->num_rows > 0) {
-                    while ($row = $resultTransactionTypes->fetch_assoc()) {
-                        echo "<option value='" . $row['transaction_type'] . "'>" . $row['transaction_type'] . "</option>";
+                        while ($row = $resultTransactionTypes->fetch_assoc()) {
+                            echo "<option value='" . $row['transaction_type'] . "'>" . $row['transaction_type'] . "</option>";
+                            }
                         }
-                    }
-                    $conn->close();
+                   
                     ?>
                     </select>
                 </div>
@@ -196,15 +194,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="text" name="transaction_quantity" id="transaction_quantity" required>
                 </div>
 
+             <div class="field input">
+                    <label for="stock_location">Stock Location</label>
+                    <select name="stock_location"  id ="stock_location"required>
+                    <?php                
+                    // Fetch warehouse  from the Stock location table
+                    $sqlStockLoction = "SELECT stock_location FROM stocklocation";
+                    $resultStockLocation = $conn->query($sqlStockLoction);
+                    if ($resultStockLocation->num_rows > 0) {
+                    while ($row = $resultStockLocation->fetch_assoc()) {
+                        echo "<option value='" . $row['stock_location'] . "'>" . $row['stock_location'] . "</option>";
+                        }
+                    }
+                   
+                    ?>
+                    </select>
+                    
+                </div> 
+
                 <div class="field input">
                     <label for="stakeholder">Choose Stakeholder</label>
-                    <select name="stakeholder" required>
-                        <option value="none">None</option>
-                        <option value="inventory">Inventory</option>
-                        <option value="production">Production</option>
-                        <option value="IT">IT</option>
-                        <option value="operations">Operations</option>
-                    </select>
+                    <input type="text" name="stakeholder" id="stakeholder" required>
                     </div>
                     <br>
 
@@ -215,7 +225,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div class="field input">
                     <label for="truck">Truck Number</label>
-                    <input type="text" name="truck" id="truck" required>
+                    <input type="text" name="truck" id="truck" maxlength="7" required>
                 </div>
 
                 <div class="field input">
@@ -239,6 +249,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="text" name="end_time" id="end_time" readonly>
                     </div>
                 -->
+                <div class="field input">
+                    <label for="reference">Reference</label>
+                    <input type="text" name="reference" id="reference" required>
+                    </div>
+                    <br>
 
                 <div class="field input">
                     <label for="reference">Comments</label>
@@ -248,6 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div class="field input">
                     <input type="submit" class="btn" name="submit" value="Submit">
+
                     <!--button type="submit" class="btn" name="delete">Delete</button-->
                     <button id="undo" type="button" class="green-button">Undo</button>
                     <script src="script.js" defer></script>

@@ -11,16 +11,6 @@ if ($resultStockCodes->num_rows > 0) {
     }
 }
 
-// Fetch brand from the inventory table
-$sqlBrand = "SELECT DISTINCT brand FROM inventory";
-$resultBrand = $conn->query($sqlBrand);
-$Brand = [];
-if ($resultBrand->num_rows > 0) {
-    while ($row = $resultBrand->fetch_assoc()) {
-        $Brand[] = $row['brand'];
-    }
-}
-
 // Fetch transaction types from the transactiontype table
 $sqlTransactionTypes = "SELECT DISTINCT transaction_type FROM transactiontype";
 $resultTransactionTypes = $conn->query($sqlTransactionTypes);

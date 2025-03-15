@@ -132,7 +132,7 @@
                   </div>";
 
         // Query to retrieve transaction history
-        $transactionQuery = "SELECT stockcode, transaction_date, transaction_type, transaction_quantity, reference FROM transactions WHERE stockcode = '$stockCode'";
+        $transactionQuery = "SELECT stockcode, transaction_date, transaction_type, transaction_quantity, stock_location, reference FROM transactions WHERE stockcode = '$stockCode'";
 
         // Filter condition for transaction date
         if (isset($_POST['transaction_date']) && !empty($_POST['transaction_date'])) {
@@ -154,6 +154,8 @@
                         <th>Transaction Date</th>
                         <th>Transaction Type</th>
                         <th>Transaction Quantity</th>
+                        <th>Stock location</th>
+                        <th> Brand </th>
                         <th>Reference</th>
                     </tr>";
 
@@ -164,6 +166,8 @@
             echo "<td>" . $row['transaction_date'] . "</td>";
             echo "<td>" . $row['transaction_type'] . "</td>";
             echo "<td>" . $row['transaction_quantity'] . "</td>";
+            echo "<td>" . $row['stock_location'] . "</td>";
+            echo "<td>" . $row['brand'] . "</td>";
             echo "<td>" . $row['reference'] . "</td>";
             echo "</tr>";
         }
