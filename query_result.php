@@ -74,6 +74,15 @@
     </style>
 </head>
 <body>
+<div class="navbar">
+        <div class="logo">Danco Inventory</div>
+        <div class="menu">
+            <a href="home.php">Home</a>
+            <a href="transactions.php">Transactions</a>
+            <a href="inventory_query.php">Inventory Query</a>
+            <a href="reports.php">Reports</a>
+        </div>
+    </div>
 <div class="container">
     <?php
     include 'connection.php'; // Include the connection script
@@ -132,7 +141,7 @@
                   </div>";
 
         // Query to retrieve transaction history
-        $transactionQuery = "SELECT stockcode, transaction_date, transaction_type, transaction_quantity, stock_location, reference FROM transactions WHERE stockcode = '$stockCode'";
+        $transactionQuery = "SELECT stockcode, transaction_date, transaction_type, transaction_quantity, stock_location, brand, reference FROM transactions WHERE stockcode = '$stockCode'";
 
         // Filter condition for transaction date
         if (isset($_POST['transaction_date']) && !empty($_POST['transaction_date'])) {

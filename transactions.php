@@ -20,13 +20,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stockcode = $_POST['stockcode'];
         $transaction_quantity = $_POST['transaction_quantity'];
         $reference = $_POST['reference'];
-        $stakeholer = $_POST['stakeholder'] ?? '';
+        $stakeholer = $_POST['stakeholder'];
         $name = $_POST['name'];
         $truck = $_POST['truck'];
         $timein = $_POST['timein'];
         $timeout = $_POST['timeout'];
         $brand = $_POST['brand'];
         $stock_location = $_POST['stock_location'];
+        $notation =$_POST['notation'];
 
 
         // Check if the stock code exists in the inventory
@@ -69,24 +70,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 // Insert data into transactions table
                 $sql = "INSERT INTO transactions 
-                        (stockcode, transaction_type, transaction_quantity, stock_location, reference, stakeholder, name, truck, timein, timeout, start_time, end_time, brand) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+                        (stockcode, transaction_type, transaction_quantity, stock_location, reference, stakeholder, name, truck, timein, timeout, brand, notation) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                     $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("sssssssssssss", $stockcode, $transaction_type, $transaction_quantity, $stock_location, $reference, $stakeholder, $name, $truck, $timein, $timeout, $start_time, $end_time, $brand);
+                    $stmt->bind_param("ssssssssssss", $stockcode, $transaction_type, $transaction_quantity, $stock_location, $reference, $stakeholder, $name, $truck, $timein, $timeout, $brand, $notation);
 
 
                 if ($stmt->execute()) {
                     echo "New record created successfully";
 
                     // Update inventory quantity based on transaction type
-                    if ($transaction_type == 'Issue' || $transaction_type == 'Expense' || $transaction_type == 'Negative Adjustment'
-                    || $transaction_type == 'Sample Issuance' || $transaction_type == 'Departmental Issuance' || $transaction_type == 'Sale' || $transaction_type == 'Loss/Pilferage') {
+                    if ($transaction_type == 'Issue' || $transaction_type == 'Expense' || $transaction_type == 'Negative Adjustment' || $transaction_type == 'Sample Issuance' || $transaction_type == 'Departmental Issuance' || $transaction_type == 'Sale' || $transaction_type == 'Loss/Pilferage') {
                         $updateSql = "UPDATE inventory SET quantity = quantity - ? WHERE stockcode = ?";
+
                         // positive receipts
-                    } elseif ($transaction_type == 'Receipt'  || $transaction_type == 'Positive Adjustment'  || $transaction_type == 'Production Receipt'
-                      || $transaction_type == 'Production Receipt' || $transaction_type == 'Customer Returns' || $transaction_type == 'Sample Return' || $transaction_type == 'Transfer In'
-                        || $transaction_type == 'Used Spare Receipts' || $transaction_type == 'Bi-product Receipt') 
+                    } elseif ($transaction_type == 'Receipt'  || $transaction_type == 'Positive Adjustment'  || $transaction_type == 'Production Receipt' || $transaction_type == 'Customer Returns' || $transaction_type == 'Sample Return' || $transaction_type == 'Transfer In' || $transaction_type == 'Used Spare Receipts' || $transaction_type == 'Bi-product Receipt') 
                     {
                         $updateSql = "UPDATE inventory SET quantity = quantity + ? WHERE stockcode = ?";
                     }
@@ -256,9 +255,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <br>
 
                 <div class="field input">
-                    <label for="reference">Comments</label>
+                    <label for="notation">Notation</label>
                     <br>
-                    <input type="text" name="reference" id="reference" required>
+                    <input type="text" name="notation" id="notation" required>
                 </div>
 
                 <div class="field input">
