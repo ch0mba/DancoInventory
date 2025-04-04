@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         // Escape user inputs to prevent SQL injection
+        $warehouse=$_POST['warehouse'];
         $stockcode = $_POST['stockcode'];
         $transaction_quantity = $_POST['transaction_quantity'];
         $reference = $_POST['reference'];
@@ -30,17 +31,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $notation =$_POST['notation'];
 
 
+        /*//check if warehouse exist in warehouse
+        $checkSql = "SELECT * FROM warehouse WHERE warehouse = ?";
+        $stmt = $conn->prepare($checkSql);
+        $stmt->bind_param("s", $warehouse);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
         // Check if the stock code exists in the inventory
+        $checkSql = "SELECT i.stockcode 
+             FROM warehouse w
+             JOIN inventory i ON w.warehouse = i.warehouse
+             WHERE w.warehouse = ? AND i.stockcode = ?";
+
+            $stmt = $conn->prepare($checkSql);
+            $stmt->bind_param("ss", $warehouse, $stockcode);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
         $checkSql = "SELECT * FROM inventory WHERE stockcode = ?";
         $stmt = $conn->prepare($checkSql);
         $stmt->bind_param("s", $stockcode);
         $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $stmt->get_result();*/
 
-        if ($result->num_rows > 0) {
+        // Check if warehouse exists in the warehouse table
+        $checkSql = "SELECT * FROM warehouse WHERE warehouse = ?";
+        $stmt = $conn->prepare($checkSql);
+        $stmt->bind_param("s", $warehouse);
+        $stmt->execute();
+        $resultWarehouse = $stmt->get_result();
+
+        // Check if warehouse exists before proceeding
+        if ($resultWarehouse->num_rows > 0) {
+            // Close the first statement before preparing a new one
+            $stmt->close();
+
+            // Check if the stock code exists in the inventory for the selected warehouse
+            $checkSql = "SELECT i.stockcode 
+                        FROM inventory i 
+                        WHERE i.warehouse = ? AND i.stockcode = ?";
+            
+            $stmt = $conn->prepare($checkSql);
+            $stmt->bind_param("ss", $warehouse, $stockcode);
+            $stmt->execute();
+            $resultInventory = $stmt->get_result();
+
+        if ($resultInventory->num_rows > 0) {
             // Stock code exists, proceed with the transaction
-            $inventoryRow = $result->fetch_assoc();
-            $current_quantity = $inventoryRow['quantity'];
+            $inventoryRow = $resultInventory->fetch_assoc();
+            $current_quantity = isset($inventoryRow['quantity']) ? $inventoryRow['quantity'] : 0;
 
             // Escape user inputs to prevent SQL injection
             $transaction_type = $_POST['transaction_type'];
@@ -70,24 +111,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 // Insert data into transactions table
                 $sql = "INSERT INTO transactions 
-                        (stockcode, transaction_type, transaction_quantity, stock_location, reference, stakeholder, name, truck, timein, timeout, brand, notation) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        (stockcode, warehouse,transaction_type, transaction_quantity, stock_location, reference, stakeholder, name, truck, timein, timeout, brand, notation) 
+                        VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                     $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("ssssssssssss", $stockcode, $transaction_type, $transaction_quantity, $stock_location, $reference, $stakeholder, $name, $truck, $timein, $timeout, $brand, $notation);
+                    $stmt->bind_param("sssssssssssss", $stockcode,$warehouse, $transaction_type, $transaction_quantity, $stock_location, $reference, $stakeholder, $name, $truck, $timein, $timeout, $brand, $notation);
 
 
                 if ($stmt->execute()) {
                     echo "New record created successfully";
 
                     // Update inventory quantity based on transaction type
-                    if ($transaction_type == 'Issue' || $transaction_type == 'Expense' || $transaction_type == 'Negative Adjustment' || $transaction_type == 'Sample Issuance' || $transaction_type == 'Departmental Issuance' || $transaction_type == 'Sale' || $transaction_type == 'Loss/Pilferage') {
+                    if ($transaction_type == 'Issue' || $transaction_type == 'Expense' || $transaction_type == 'Negative Adjustment' || $transaction_type == 'Sample Issuance' || $transaction_type == 'Departmental Issuance' || $transaction_type == 'Sale' || $transaction_type == 'Loss/Pilferage' || $transaction_type == 'Transfer Out') {
                         $updateSql = "UPDATE inventory SET quantity = quantity - ? WHERE stockcode = ?";
 
+                       
                         // positive receipts
                     } elseif ($transaction_type == 'Receipt'  || $transaction_type == 'Positive Adjustment'  || $transaction_type == 'Production Receipt' || $transaction_type == 'Customer Returns' || $transaction_type == 'Sample Return' || $transaction_type == 'Transfer In' || $transaction_type == 'Used Spare Receipts' || $transaction_type == 'Bi-product Receipt') 
                     {
                         $updateSql = "UPDATE inventory SET quantity = quantity + ? WHERE stockcode = ?";
+                    }
+
+                     elseif ($transaction_type == 'Stock Take Override') {
+                    // Reset quantity to the new quantity provided
+                    $updateSql = "UPDATE inventory SET quantity = ? WHERE stockcode = ?";
                     }
 
                     $stmt = $conn->prepare($updateSql);
@@ -109,8 +156,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Stock code does not exist";
         }
     }
-}
-                 
+ }
+}                
 
 ?>
 <!DOCTYPE html>
@@ -158,6 +205,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <header>New Transaction</header>
             <form action="" method="post">
                 <!-- Remove ID field from the form -->
+
+                <div class="field input">
+                    <label for="warehouse">Warehouse</label>
+                    <select name="warehouse"  id ="warehouse"required>
+                    <?php                
+                    // Fetch warehouse  from the Stock location table
+                    $sqlWarehouse = "SELECT warehouse FROM warehouse";
+                    $resultWarehouse = $conn->query($sqlWarehouse);
+                    if ($resultWarehouse->num_rows > 0) {
+                    while ($row = $resultWarehouse->fetch_assoc()) {
+                        echo "<option value='" . $row['warehouse'] . "'>" . $row['warehouse'] . "</option>";
+                        }
+                    }
+                   
+                    ?>
+                    </select>
+                    
+                </div> 
 
                 <div class="field input">
                     <label for="stockcode">Stock Code</label>

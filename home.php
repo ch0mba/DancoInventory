@@ -35,6 +35,7 @@
     .purple { background-color:#9b59b6; }
     .yellow { background-color:#c2b300; }
     .black { background-color:black; }
+    .brown { background-color:brown; }
     h2 {
         color: #fff;
         font-size: 24px;
@@ -61,6 +62,11 @@
     <a href="stocklocation_setup.php"class="box black ">
         <h2>Stock Location Setup</h2>
     </a> 
+
+    <a href="stocktake.php"class="box brown ">
+        <h2>Stock Take</h2>
+    </a> 
+
     <a href="reports.php"class="box pink">
         <h2>Reports</h2>
     </a>
