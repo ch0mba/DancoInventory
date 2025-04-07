@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         // Escape user inputs to prevent SQL injection
         $stockcode = $_POST['stockcode'];
+        $warehouse = $_POST['warehouse'];
         $quantity = $_POST['quantity'];
         $brand = $_POST['brand'];
         $stock_location = $_POST['stock_location'];
@@ -27,9 +28,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
         // Check if the stock code exists in the inventory
-        $checkSql = "SELECT * FROM inventory WHERE stockcode = ?";
+        $checkSql = "SELECT stockcode FROM inventory WHERE stockcode = ? and warehouse = ?";
         $stmt = $conn->prepare($checkSql);
-        $stmt->bind_param("s", $stockcode);
+        $stmt->bind_param("ss", $stockcode, $warehouse);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -53,10 +54,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             
                 // Insert data into stocktake table
-                $sql = "INSERT INTO stocktake (stockcode, brand, stock_location, quantity,uom,length, timestamp, comment) 
-                    VALUES (?, ?, ?, ?,?,?, NOW(), ?)";
+                $sql = "INSERT INTO stocktake (stockcode, warehouse, brand, stock_location, quantity,uom,length, timestamp, comment) 
+                    VALUES (?, ?, ?, ?, ?,?,?, NOW(), ?)";
                     $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("sssisis", $stockcode, $brand, $stock_location, $quantity,$uom,$length, $comment);
+                    $stmt->bind_param("sssisis", $stockcode, $warehouse, $brand, $stock_location, $quantity,$uom,$length, $comment);
         
 
 
@@ -69,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
                     $stmt = $conn->prepare($updateSql);
-                    $stmt->bind_param("sssisis",$stockcode, $brand, $stock_location, $quantity, $uom, $length, $comment);
+                    $stmt->bind_param("ssssisis",$stockcode, $warehouse, $brand, $stock_location, $quantity, $uom, $length, $comment);
 
                     if ($stmt->execute()) {
                         echo "Stock take record added successfully";
@@ -77,10 +78,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         echo "Error inserting record: " . $stmt->error;
                     }
                 } else {
-                    echo "Transaction type not found";
+                    echo "Transaction type not found" . $conn->error;
                 }
             }
                 
+         }
+         else {
+            echo "Stock code does not exist in the inventory"	. $conn->error;
          }
    }
 }
@@ -132,6 +136,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <header>New Transaction</header>
             <form action="" method="post">
                 <!-- Remove ID field from the form -->
+
+                <div class="field input">
+                    <label for="warehouse">Warehouse</label>
+                    <select name="warehouse"  id ="warehouse"required>
+                    <?php                
+                    // Fetch warehouse  from the Stock location table
+                    $sqlWarehouse = "SELECT warehouse FROM warehouse";
+                    $resultWarehouse = $conn->query($sqlWarehouse);
+                    if ($resultWarehouse->num_rows > 0) {
+                    while ($row = $resultWarehouse->fetch_assoc()) {
+                        echo "<option value='" . $row['warehouse'] . "'>" . $row['warehouse'] . "</option>";
+                        }
+                    }
+                   
+                    ?>
+                    </select>
 
                 <div class="field input">
                     <label for="stockcode">Stock Code</label>
